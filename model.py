@@ -1,12 +1,10 @@
 import chromadb
-import logging
-import sys
 
 from llama_index.llms.ollama import Ollama
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core import (Settings, VectorStoreIndex, SimpleDirectoryReader, PromptTemplate)
 from llama_index.core import StorageContext
 from llama_index.vector_stores.chroma import ChromaVectorStore
+from llama_index.embeddings.ollama import OllamaEmbedding
 
 import logging
 import sys
@@ -18,8 +16,9 @@ query_engine = None
 
 
 def init_llm():
-    llm = Ollama(model="llama2", request_timeout=300.0)
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    llm = Ollama(model="phi3.5:3.8b-mini-instruct-q8_0", base_url="", request_timeout=300.0)
+    # embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    embed_model = OllamaEmbedding(model_name="bge-m3:latest", base_url="", request_timeout=300.0)
 
     Settings.llm = llm
     Settings.embed_model = embed_model
@@ -32,7 +31,7 @@ def init_index(embed_model):
     logging.info("index creating with `%d` documents", len(documents))
 
     chroma_client = chromadb.EphemeralClient()
-    chroma_collection = chroma_client.create_collection("iollama")
+    chroma_collection = chroma_client.create_collection("DocuRAG")
 
     vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
 
@@ -49,18 +48,18 @@ def init_index(embed_model):
 def init_query_engine(index):
     global query_engine
 
-    # custome prompt template
+    # custom prompt template
     template = (
-        "Imagine you are an advanced AI expert in cyber security laws, with access to all current and relevant legal documents, "
-        "case studies, and expert analyses. Your goal is to provide insightful, accurate, and concise answers to questions in this domain.\n\n"
+        "Imagine you are an advanced AI expert in document QA. Your goal is to provide insightful, accurate, and "
+        "concise answers to questions in this domain.\n\n"
         "Here is some context related to the query:\n"
         "-----------------------------------------\n"
         "{context_str}\n"
         "-----------------------------------------\n"
-        "Considering the above information, please respond to the following inquiry with detailed references to applicable laws, "
-        "precedents, or principles where appropriate:\n\n"
+        "Considering the above information, please respond to the following inquiry with detailed references :\n\n"
         "Question: {query_str}\n\n"
-        "Answer succinctly, starting with the phrase 'According to cyber security law,' and ensure your response is understandable to someone without a legal background."
+        "Answer succinctly, starting with the phrase 'According to your document,' and ensure your response is "
+        "understandable to anyone."
     )
     qa_template = PromptTemplate(template)
 
