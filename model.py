@@ -1,10 +1,9 @@
-import chromadb
+import os
 
-from llama_index.llms.ollama import Ollama
-from llama_index.core import (Settings, VectorStoreIndex, SimpleDirectoryReader, PromptTemplate)
-from llama_index.core import StorageContext
-from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.embeddings.ollama import OllamaEmbedding
+from llama_index.core import Settings
+from llama_index.llms.vertex import Vertex
+from llama_index.indices.managed.vertexai import VertexAIIndex
+from credentials import *
 
 import logging
 import sys
@@ -15,69 +14,71 @@ global query_engine
 query_engine = None
 
 
+
 def init_llm():
-    llm = Ollama(model="phi3.5:3.8b-mini-instruct-q8_0", base_url="", request_timeout=300.0)
-    # embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
-    embed_model = OllamaEmbedding(model_name="bge-m3:latest", base_url="", request_timeout=300.0)
+    vertex_gemini = Vertex(
+        model="gemini-1.5-pro-preview-0514",
+        temperature=0,
+        context_window=100000,
+        additional_kwargs={}
+    )
+    Settings.llm = vertex_gemini
 
-    Settings.llm = llm
-    Settings.embed_model = embed_model
 
+def init_index():
 
-def init_index(embed_model):
-    reader = SimpleDirectoryReader(input_dir="./docs", recursive=True)
-    documents = reader.load_data()
+    # Optional: If creating a new corpus
+    corpus_display_name = "docusign-corpus"
+    corpus_description = "Vertex AI Corpus for LlamaIndex"
 
-    logging.info("index creating with `%d` documents", len(documents))
+    # Create a corpus or provide an existing corpus ID
+    index = VertexAIIndex(
+        project_id=project_id,
+        location=location,
+        corpus_display_name=corpus_display_name,
+        corpus_description=corpus_description,
+        show_progress=True
+    )
+    print(f"Newly created corpus name is {index.corpus_name}.")
 
-    chroma_client = chromadb.EphemeralClient()
-    chroma_collection = chroma_client.create_collection("DocuRAG")
-
-    vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-
-    storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-    # use this to set custom chunk size and splitting
-    # https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/
-
-    index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, embed_model=embed_model)
-
+    # Upload local file
+    file_name = index.insert_file(
+        file_path="docs/paul_graham_essay.txt",
+        metadata={
+            "display_name": "paul_graham_essay",
+            "description": "Paul Graham essay",
+        },
+    )
+    print(index.list_files())
     return index
 
 
 def init_query_engine(index):
     global query_engine
-
-    # custom prompt template
-    template = (
-        "Imagine you are an advanced AI expert in document QA. Your goal is to provide insightful, accurate, and "
-        "concise answers to questions in this domain.\n\n"
-        "Here is some context related to the query:\n"
-        "-----------------------------------------\n"
-        "{context_str}\n"
-        "-----------------------------------------\n"
-        "Considering the above information, please respond to the following inquiry with detailed references :\n\n"
-        "Question: {query_str}\n\n"
-        "Answer succinctly, starting with the phrase 'According to your document,' and ensure your response is "
-        "understandable to anyone."
-    )
-    qa_template = PromptTemplate(template)
-
-    # build query engine with custom template
-    # text_qa_template specifies custom template
-    # similarity_top_k configure the retriever to return the top 3 most similar documents,
-    # the default value of similarity_top_k is 2
-    query_engine = index.as_query_engine(text_qa_template=qa_template, similarity_top_k=3)
+    query_engine = index.as_query_engine(similarity_top_k=3)
 
     return query_engine
 
 
-def chat(input_question, user):
+def chat(input_question):
     global query_engine
 
-    response = query_engine.query(input_question)
-    logging.info("got response from llm - %s", response)
+    # Querying.
+    response = query_engine.query("What did Paul Graham do growing up?")
 
+    # Show response.
+    # print(f"Response is {response.response}")
+
+    # # Show cited passages that were used to construct the response.
+    # for cited_text in [node.text for node in response.source_nodes]:
+    #     print(f"Cited text: {cited_text}")
+
+    # Show answerability. 0 means not answerable from the passages.
+    # 1 means the model is certain the answer can be provided from the passages.
+    # if response.metadata:
+    #     print(
+    #         f"Answerability: {response.metadata.get('answerable_probability', 0)}"
+    #     )
     return response.response
 
 
@@ -95,6 +96,6 @@ def chat_cmd():
 
 if __name__ == '__main__':
     init_llm()
-    index = init_index(Settings.embed_model)
+    index = init_index()
     init_query_engine(index)
     chat_cmd()
