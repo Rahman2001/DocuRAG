@@ -2,6 +2,7 @@ llama-index-llms-gemini
 llama-index-indices-managed-vertexai
 llama-index-llms-vertex
 llama-index
-google-cloud-aiplatform==1.70.0
+google-cloud-aiplatform
 protobuf
 aiofiles
+Flask~=2.0.1

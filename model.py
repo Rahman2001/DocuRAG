@@ -1,101 +1,83 @@
-import os
+from vertexai.preview import rag
+from vertexai.preview.generative_models import GenerativeModel, Tool
+import vertexai
 
-from llama_index.core import Settings
-from llama_index.llms.vertex import Vertex
-from llama_index.indices.managed.vertexai import VertexAIIndex
 from credentials import *
 
-import logging
-import sys
+# Create a RAG Corpus, Import Files, and Generate a response
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Initialize Vertex AI API once per session
+vertexai.init(project=project_id, location=location)
 
-global query_engine
-query_engine = None
+# Create RagCorpus
+# Configure embedding model, for example "text-embedding-004".
+embedding_model_config = rag.EmbeddingModelConfig(
+    publisher_model="publishers/google/models/text-embedding-004"
+)
 
+rag_corpus = rag.create_corpus(
+    display_name="docurag-corpus",
+    embedding_model_config=embedding_model_config,
+)
 
+# Import Files to the RagCorpus
+rag.import_files(
+    rag_corpus.name,
+    paths,
+    chunk_size=512,  # Optional
+    chunk_overlap=100,  # Optional
+    max_embedding_requests_per_min=900,  # Optional
+)
 
-def init_llm():
-    vertex_gemini = Vertex(
-        model="gemini-1.5-pro-preview-0514",
-        temperature=0,
-        context_window=100000,
-        additional_kwargs={}
+# Direct context retrieval
+response = rag.retrieval_query(
+    rag_resources=[
+        rag.RagResource(
+            rag_corpus=rag_corpus.name,
+            # Optional: supply IDs from `rag.list_files()`.
+            # rag_file_ids=["rag-file-1", "rag-file-2", ...],
+        )
+    ],
+    text="list AI models evaluated with needle-in-a-haystack testing",
+    similarity_top_k=10,  # Optional
+    vector_distance_threshold=0.5,  # Optional
+)
+print('Below is response from retrieval query: ')
+print(response)
+
+# Enhance generation
+# Create a RAG retrieval tool
+rag_retrieval_tool = Tool.from_retrieval(
+    retrieval=rag.Retrieval(
+        source=rag.VertexRagStore(
+            rag_resources=[
+                rag.RagResource(
+                    rag_corpus=rag_corpus.name,  # Currently only 1 corpus is allowed.
+                    # Optional: supply IDs from `rag.list_files()`.
+                    # rag_file_ids=["rag-file-1", "rag-file-2", ...],
+                )
+            ],
+            similarity_top_k=3,  # Optional
+            vector_distance_threshold=0.5,  # Optional
+        ),
     )
-    Settings.llm = vertex_gemini
+)
+# Create a gemini-pro model instance
+rag_model = GenerativeModel(
+    model_name="gemini-1.5-pro-001", tools=[rag_retrieval_tool]
+)
 
-
-def init_index():
-
-    # Optional: If creating a new corpus
-    corpus_display_name = "docusign-corpus"
-    corpus_description = "Vertex AI Corpus for LlamaIndex"
-
-    # Create a corpus or provide an existing corpus ID
-    index = VertexAIIndex(
-        project_id=project_id,
-        location=location,
-        corpus_display_name=corpus_display_name,
-        corpus_description=corpus_description,
-        show_progress=True
-    )
-    print(f"Newly created corpus name is {index.corpus_name}.")
-
-    # Upload local file
-    file_name = index.insert_file(
-        file_path="docs/paul_graham_essay.txt",
-        metadata={
-            "display_name": "paul_graham_essay",
-            "description": "Paul Graham essay",
-        },
-    )
-    print(index.list_files())
-    return index
-
-
-def init_query_engine(index):
-    global query_engine
-    query_engine = index.as_query_engine(similarity_top_k=3)
-
-    return query_engine
-
-
-def chat(input_question):
-    global query_engine
-
-    # Querying.
-    response = query_engine.query("What did Paul Graham do growing up?")
-
-    # Show response.
-    # print(f"Response is {response.response}")
-
-    # # Show cited passages that were used to construct the response.
-    # for cited_text in [node.text for node in response.source_nodes]:
-    #     print(f"Cited text: {cited_text}")
-
-    # Show answerability. 0 means not answerable from the passages.
-    # 1 means the model is certain the answer can be provided from the passages.
-    # if response.metadata:
-    #     print(
-    #         f"Answerability: {response.metadata.get('answerable_probability', 0)}"
-    #     )
-    return response.response
-
-
-def chat_cmd():
-    global query_engine
-
-    while True:
-        input_question = input("Enter your question (or 'exit' to quit): ")
-        if input_question.lower() == 'exit':
-            break
-
-        response = query_engine.query(input_question)
-        logging.info("got response from llm - %s", response)
-
-
-if __name__ == '__main__':
-    init_llm()
-    index = init_index()
-    init_query_engine(index)
-    chat_cmd()
+# Generate response
+response = rag_model.generate_content("What is RAG and why it is helpful?")
+print('Below is response from generation query: ')
+print(response.text)
+# Example response:
+#   RAG stands for Retrieval-Augmented Generation.
+#   It's a technique used in AI to enhance the quality of responses
+# ...
+#
+# if __name__ == '__main__':
+#     init_llm()
+#     index = init_index()
+#     init_query_engine(index)
+#     chat_cmd()
