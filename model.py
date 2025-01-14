@@ -34,22 +34,6 @@ class Model:
             max_embedding_requests_per_min=900,  # Optional
         )
 
-        # Direct context retrieval
-        # response = rag.retrieval_query(
-        #     rag_resources=[
-        #         rag.RagResource(
-        #             __rag_corpus=__rag_corpus.name,
-        #             # Optional: supply IDs from `rag.list_files()`.
-        #             # rag_file_ids=["rag-file-1", "rag-file-2", ...],
-        #         )
-        #     ],
-        #     text="list AI models evaluated with needle-in-a-haystack testing",
-        #     similarity_top_k=10,  # Optional
-        #     vector_distance_threshold=0.5,  # Optional
-        # )
-        # print('Below is response from retrieval query: ')
-        # print(response)
-
     def init_llm(self, has_rag_corpus=True):
         # Create a RAG retrieval tool
         if has_rag_corpus:
