@@ -1,3 +1,5 @@
+import logging
+
 from vertexai.preview import rag
 from vertexai.preview.generative_models import GenerativeModel, Tool
 import vertexai
@@ -27,13 +29,14 @@ class Model:
         )
 
         # Import Files to the RagCorpus
-        rag.import_files(
+        response = rag.import_files(
             self.__rag_corpus.name,
             paths,
             chunk_size=512,  # Optional
             chunk_overlap=100,  # Optional
             max_embedding_requests_per_min=900,  # Optional
         )
+        logging.info("response from rag.import_files.imported_rag_files_count: %s", response.imported_rag_files_count)
 
     def init_llm(self, has_rag_corpus=True):
         # Create a RAG retrieval tool
@@ -78,7 +81,7 @@ class Model:
     # chat for api call
     def chat(self, message: str):
         chat = self.__chat
-        response = chat.send_message(message).text
+        response = chat.send_message(message)
         print('Below is response from chat query: ')
         print(response.text)
         return response.text
