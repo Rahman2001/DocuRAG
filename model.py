@@ -10,11 +10,12 @@ from credentials import *
 class Model:
     # Initialize Vertex AI API once per session
     def __init__(self):
+        self.__chat = None
         self.__rag_corpus = None
         self.__rag_model = None
         vertexai.init(project=project_id, location=location)
-        # Create RagCorpus
-        # Configure embedding model, for example "text-embedding-004".
+
+        # Configure embedding model, for example "text-embedding-004", using RagCorpus
         self.__embedding_model_config = rag.EmbeddingModelConfig(
             publisher_model="publishers/google/models/text-embedding-004"
         )
@@ -60,21 +61,32 @@ class Model:
             self.__rag_model = GenerativeModel(
                 model_name=model_name
             )
+        # Initialize chat in model
+        self.__chat = self.__rag_model.start_chat()
 
-    def chat_cmd(self, message: str):
+    # chat to test in command client
+    def chat_cmd(self):
         # Generate response
-        chat = self.__rag_model.start_chat()
+        chat = self.__chat
         question = input("Enter a question or type 'quit' to quit: ")
         while question != "\n" and question != 'quit':
             response = chat.send_message(question)
-            print('Below is response from generation query: ')
+            print('Below is response from chat query: ')
             print(response.text)
             question = input("Enter a question or type 'quit' to quit: ")
+
+    # chat for api call
+    def chat(self, message: str):
+        chat = self.__chat
+        response = chat.send_message(message).text
+        print('Below is response from chat query: ')
+        print(response.text)
+        return response.text
 
 
 if __name__ == '__main__':
     model = Model()
     model.init_rag_corpus("sample-article1-corpus")
     model.init_llm()
-    model.chat_cmd("what are the AI models that were evaluated with needle-in-a-haystack testing?")
+    model.chat_cmd()
 
