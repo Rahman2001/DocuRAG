@@ -15,7 +15,7 @@ class Model:
         self.__chat = None
         self.__rag_corpus = None
         self.__rag_model = None
-        vertexai.init(project=project_id, location=location)
+        vertexai.init(project=PROJECT_ID, location=LOCATION)
 
         # Configure embedding model, for example "text-embedding-004", using RagCorpus
         self.__embedding_model_config = rag.EmbeddingModelConfig(
@@ -31,7 +31,7 @@ class Model:
         # Import Files to the RagCorpus
         response = rag.import_files(
             self.__rag_corpus.name,
-            paths,
+            PATHS,
             chunk_size=512,  # Optional
             chunk_overlap=100,  # Optional
             max_embedding_requests_per_min=900,  # Optional
@@ -58,11 +58,11 @@ class Model:
             )
             # Create a model instance with rag tool
             self.__rag_model = GenerativeModel(
-                model_name=model_name, tools=[rag_retrieval_tool]
+                model_name=MODEL_NAME, tools=[rag_retrieval_tool]
             )
         else:
             self.__rag_model = GenerativeModel(
-                model_name=model_name
+                model_name=MODEL_NAME
             )
         # Initialize chat in model
         self.__chat = self.__rag_model.start_chat()

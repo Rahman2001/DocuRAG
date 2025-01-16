@@ -6,6 +6,10 @@ from flask import jsonify
 from flask import request
 from flask_cors import CORS
 
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from google_auth_oauthlib.flow import InstalledAppFlow
+
 from model import *
 
 app = Flask(__name__)
@@ -14,6 +18,10 @@ CORS(app)
 __model = None
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+@app.route('/api/docurag/oauth/authorize', methods=['GET', 'POST'])
+def authorize():
+    return None
 
 
 @app.route('/api/question', methods=['GET'])
