@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 from uuid import uuid4
@@ -44,6 +45,40 @@ def token():
     access_token = uuid4()
     refresh_token = uuid4()
     return {'access_token': access_token, 'refresh_token': refresh_token}
+
+
+@app.route('/api/docurag/getTypeNames', methods=['GET', 'POST'])
+def get_type_names():
+    with open('get_type_names.json') as f:
+        return json.load(f)
+
+
+@app.route('/api/docurag/getTypeDefinitions', methods=['GET', 'POST'])
+def get_type_definitions():
+    with open('get_type_definitions.json') as f:
+        return json.load(f)
+
+
+@app.route('/api/docurag/createRecord', methods=['POST'])
+def create_record():
+    return {'recordId': "abc-123-def-456-success"}
+
+
+@app.route('/api/docurag/searchRecord', methods=['POST'])
+def search_record():
+    return {
+        "records": [
+            {
+                "Id": "abc-123-def-456",
+                "Name": "Signer"
+            }
+        ]
+    }
+
+
+@app.route('/api/docurag/patchRecord', methods=['POST'])
+def patch_record():
+    return {'success': True}
 
 
 @app.route('/api/question', methods=['GET'])

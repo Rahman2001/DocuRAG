@@ -1,0 +1,97 @@
+{
+  "declarations": [
+    {
+      "$class": "concerto.metamodel@1.0.0.ConceptDeclaration",
+      "name": "Signer",
+      "isAbstract": false,
+      "decorators": [
+        {
+          "$class": "concerto.metamodel@1.0.0.Decorator",
+          "name": "Term",
+          "arguments": [
+            {
+              "$class": "concerto.metamodel@1.0.0.DecoratorString",
+              "value": "Signer"
+            }
+          ]
+        },
+        {
+          "$class": "concerto.metamodel@1.0.0.Decorator",
+          "name": "Crud",
+          "arguments": [
+            {
+              "$class": "concerto.metamodel@1.0.0.DecoratorString",
+              "value": "Createable,Readable,Updateable"
+            }
+          ]
+        }
+      ],
+      "identified": {
+        "$class": "concerto.metamodel@1.0.0.IdentifiedBy",
+        "name": "Email"
+      },
+      "properties": [
+        {
+          "$class": "concerto.metamodel@1.0.0.StringProperty",
+          "name": "Email",
+          "isOptional": false,
+          "isArray": false,
+          "decorators": [
+            {
+              "$class": "concerto.metamodel@1.0.0.Decorator",
+              "name": "Term",
+              "arguments": [
+                {
+                  "$class": "concerto.metamodel@1.0.0.DecoratorString",
+                  "value": "Signer Email"
+                }
+              ]
+            },
+            {
+              "$class": "concerto.metamodel@1.0.0.Decorator",
+              "name": "Crud",
+              "arguments": [
+                {
+                  "$class": "concerto.metamodel@1.0.0.DecoratorString",
+                  "value": "Createable,Readable,Updateable"
+                }
+              ]
+            }
+          ],
+          "lengthValidator": {
+            "$class": "concerto.metamodel@1.0.0.StringLengthValidator",
+            "maxLength": 50
+          }
+        },
+        {
+          "$class": "concerto.metamodel@1.0.0.StringProperty",
+          "name": "Google_Drive",
+          "isOptional": false,
+          "isArray": false,
+          "decorators": [
+            {
+              "$class": "concerto.metamodel@1.0.0.Decorator",
+              "name": "Term",
+              "arguments": [
+                {
+                  "$class": "concerto.metamodel@1.0.0.DecoratorString",
+                  "value": "Google Drive link"
+                }
+              ]
+            },
+            {
+              "$class": "concerto.metamodel@1.0.0.Decorator",
+              "name": "Crud",
+              "arguments": [
+                {
+                  "$class": "concerto.metamodel@1.0.0.DecoratorString",
+                  "value": "Createable,Readable,Updateable"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+	"id": "f5db75b4-ed69-4d1b-af5f-6b4dbd13727d",
+	"name": "DocuRAG",
+	"description": {
+		"short": "This is a RAG application for document QA",
+		"long": "This extensio app uses AI to comprehend a document for QA."
+	},
+	"termsOfServiceUrl": "https://www.samplecompany.com/tos",
+	"privacyUrl": "https://www.samplecompany.com/privacy-security",
+	"supportUrl": "https://www.samplecompany.com/support",
+	"publisher": {
+		"name": "Rahman Rejepov",
+		"email": "rahmanrejepov777@gmail.com"
+	},
+	"connections": [
+		{
+			"id": "d989edd9-596f-4a2b-bfca-f3ac6864c464",
+			"name": "authentication",
+			"description": "Secure connection to Sample Extension App",
+			"type": "oauth2",
+			"params": {
+				"provider": "CUSTOM",
+				"clientId": "sKY8MFMcR41",
+				"clientSecret": "[omitted]",
+				"scopes": [],
+				"customConfig": {
+					"authorizationMethod": "header",
+					"authorizationParams": {
+						"prompt": "consent",
+						"access_type": "offline"
+					},
+					"authorizationUrl": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/oauth/authorize",
+					"requiredScopes": [],
+					"scopeSeparator": " ",
+					"tokenUrl": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/oauth/token",
+					"refreshScopes": []
+				}
+			}
+		}
+	],
+	"icon": {
+		"data": "[omitted]",
+		"mediaType": "image/png",
+		"id": "915c2578-ba01-4874-af64-060f866dfb67"
+	},
+	"screenshots": [],
+	"extensions": [
+		{
+			"name": "My Data Read and Data Write Extension",
+			"description": "Used in data read and write flow",
+			"template": "DataIO.Version6.DataInputOutput",
+			"actionReferences": [
+				"DocuRAG DataReadWrite GetTypeNames Action",
+				"DocuRAG DataReadWrite CreateRecord Action",
+				"DocuRAG DataReadWrite PatchRecord Action",
+				"DocuRAG DataReadWrite GetTypeDefinitions Action",
+				"DocuRAG DataReadWrite SearchRecords Action"
+			]
+		}
+	],
+	"actions": [
+		{
+			"name": "DocuRAG DataReadWrite GetTypeNames Action",
+			"description": "Gets Signer type name",
+			"template": "DataIO.Version6.GetTypeNames",
+			"connectionsReference": "authentication",
+			"params": {
+				"uri": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/getTypeNames"
+			}
+		},
+		{
+			"name": "DocuRAG DataReadWrite CreateRecord Action",
+			"description": "Creates a record of new Signer object and sends AI RAG appointment to that Signer",
+			"template": "DataIO.Version6.CreateRecord",
+			"connectionsReference": "authentication",
+			"params": {
+				"uri": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/createRecord"
+			}
+		},
+		{
+			"name": "DocuRAG DataReadWrite PatchRecord Action",
+			"description": "Updates a record of the Signer object and sends AI RAG appointment to that Signer",
+			"template": "DataIO.Version6.PatchRecord",
+			"connectionsReference": "authentication",
+			"params": {
+				"uri": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/patchRecord"
+			}
+		},
+		{
+			"name": "DocuRAG DataReadWrite GetTypeDefinitions Action",
+			"description": "Gets Signer type definition",
+			"template": "DataIO.Version6.GetTypeDefinitions",
+			"connectionsReference": "authentication",
+			"params": {
+				"uri": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/getTypeDefinitions"
+			}
+		},
+		{
+			"name": "DocuRAG DataReadWrite SearchRecords Action",
+			"description": "Searches a record of the Signer object and sends AI RAG appointment to that Signer",
+			"template": "DataIO.Version6.SearchRecords",
+			"connectionsReference": "authentication",
+			"params": {
+				"uri": "https://cb5b-88-240-183-220.ngrok-free.app/api/docurag/searchRecord"
+			}
+		}
+	],
+	"changelog": "",
+	"publicationRegions": [
+		"US"
+	],
+	"distribution": "PUBLIC"
+}

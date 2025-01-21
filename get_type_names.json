@@ -1,0 +1,9 @@
+{
+  "typeNames": [
+    {
+      "typeName": "Signer",
+      "label": "Signer",
+      "description": "A person who will view or sign a document"
+    }
+  ]
+}
