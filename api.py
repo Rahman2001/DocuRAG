@@ -7,6 +7,9 @@ from flask import Flask, redirect
 from flask import jsonify
 from flask import request
 from flask_cors import CORS
+
+from utils import email
+from db import MongoDB
 from flask_session import Session
 
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -20,6 +23,7 @@ Session(app)
 CORS(app, supports_credentials=True)
 
 __model = None
+__mongodb = None
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -61,7 +65,14 @@ def get_type_definitions():
 
 @app.route('/api/docurag/createRecord', methods=['POST'])
 def create_record():
-    return {'recordId': "abc-123-def-456-success"}
+    print(f'create_record request body: {request.json}')
+    # save email and idempotencyKey in database
+    record_id = __mongodb.create_record(request.json)
+    # send a message via email containing a link to the AI RAG chat
+    link = DOCURAG_DOMAIN + '?_id={}'.format(record_id)
+    result = email.send_email(RECEIVER_ACCOUNT_ID, f'link to AI RAG: {link}')
+    print(f'result of sending email: {result}')
+    return {'recordId': f'{record_id}-success'}
 
 
 @app.route('/api/docurag/searchRecord', methods=['POST'])
@@ -69,7 +80,7 @@ def search_record():
     return {
         "records": [
             {
-                "Id": "abc-123-def-456",
+                "Id": uuid4(),
                 "Name": "Signer"
             }
         ]
@@ -81,7 +92,7 @@ def patch_record():
     return {'success': True}
 
 
-@app.route('/api/question', methods=['GET'])
+@app.route('/api/docurag/chat', methods=['GET'])
 def chat_llm():
     question = request.args.get('question')
     logging.info("question: `%s`", question)
@@ -96,5 +107,6 @@ if __name__ == '__main__':
     # __model = Model()
     # __model.init_rag_corpus('docurag-article1-corpus')
     # __model.init_llm()
+    __mongodb = MongoDB('docurag-db', 'appointment')
 
     app.run(host='0.0.0.0', port=7654, debug=True)
