@@ -8,7 +8,7 @@ from flask import jsonify
 from flask import request
 from flask_cors import CORS
 
-from utils import email
+from utils import email, check_link
 from db import MongoDB
 from flask_session import Session
 
@@ -69,7 +69,7 @@ def create_record():
     # save email and idempotencyKey in database
     record_id = __mongodb.create_record(request.json)
     # send a message via email containing a link to the AI RAG chat
-    link = DOCURAG_DOMAIN + '?_id={}'.format(record_id)
+    link = DOCURAG_DOMAIN + DOCURAG_CHAT_UI_ENDPOINT + '?_id={}'.format(record_id)
     result = email.send_email(RECEIVER_ACCOUNT_ID, f'link to AI RAG: {link}')
     print(f'result of sending email: {result}')
     return {'recordId': f'{record_id}-success'}
@@ -92,15 +92,30 @@ def patch_record():
     return {'success': True}
 
 
-@app.route('/api/docurag/chat', methods=['GET'])
+@app.route('/api/docurag', methods=['GET'])
+def authenticate():
+    _id = request.args.get('_id', None)
+    if _id is None:
+        return jsonify({'error': 'Unauthorized Request'}), 401
+    document = __mongodb.get_by_id(_id)
+    if document is None:
+        return jsonify({'error': 'Unauthorized Request'}), 401
+    if check_link.is_expired(document['datetime']):
+        return jsonify({'error': 'Bad Request'}), 404
+
+    return redirect(GRADIO_APP_ENDPOINT)
+
+
+@app.route('/api/docurag/chat', methods=['GET', 'POST'])
 def chat_llm():
-    question = request.args.get('question')
-    logging.info("question: `%s`", question)
+    message = request.json['message']
+    logging.info("message: `%s`", message)
+    #
+    # resp = __model.chat(message)
+    # data = {'answer': resp}
+    data = {'answer': 'This is your answer'}
 
-    resp = __model.chat(question)
-    data = {'answer': resp}
-
-    return jsonify(data), 200
+    return data
 
 
 if __name__ == '__main__':
