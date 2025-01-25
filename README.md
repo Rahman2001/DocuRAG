@@ -24,3 +24,24 @@ Clone this repository and execute the following command:
 cd DocuRAG
 pip3 install -r requirements.txt
 ```
+### Credentials
+Here, we need to to do two thigns; first, download our credentials of Google OAuth Client in "Credentials" section which will be in <code>.json</code> format. Let's name it as <code>OAUTH_CLIENT_CREDENTIALS.json</code> to refer to it later.
+```json
+{
+  "web":
+  {
+    "client_id":"....",
+    "project_id":"....",
+    "auth_uri":"https://accounts.google.com/o/oauth2/auth",
+    "token_uri":"https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret":"...."
+  }
+}
+```
+Save the downloaded file in project root location (i.e. <code>./DocuRAG</code>); second, we need to fill our <code>credentials.py</code> with required data <i>(instructions are commented)</i>. </br><strong>Note:</strong> It is required to get a password for your email to use in your application for testing purposes. For more details, visit the link: [Support Google](https://support.google.com/mail/answer/185833?hl=en)
+### Database
+Finally, our database needs to be configured for the application. Simply, install <strong>MongoDB</strong> in your computer and create a database called <strong>"docurag-db"</strong> and collection with a name <strong>"appointment"</strong>. 
+
+## Run 
+After completing all the tasks above, we can run our application using two <code>.py</code> files, such as <code>api.py</code> and <code>llm_ui.py</code>.
