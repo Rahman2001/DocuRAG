@@ -7,4 +7,4 @@ In the world, where people and industries cooperate with each other based on doc
 Signers of documents can now easily QA documents using AI such as Google's Gemini Pro model. The following sections will explain the technical aspects and how to use this application. 
 
 ## Diagram
-
+<figure text-align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/DocuRAG%20oauth%20flowchart.drawio.svg"/><figcaption>This is the caption for the image.</figcaption></figure>
