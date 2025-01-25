@@ -8,7 +8,7 @@ Signers of documents can now easily QA documents using AI such as Google's Gemin
 
 ## Diagram
 ### Figure 1: Authorization flowchart of the application.
-<figure text-align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/DocuRAG%20oauth%20flowchart.drawio.svg"/></figure> </br>
+<div align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/DocuRAG%20oauth%20flowchart.drawio.svg"/></div> </br>
 
 ### Figure 2: Application's functional diagram.
-<figure text-align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/DocuRAG%20flowchart.drawio.svg"/></figure>
+<div align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/DocuRAG%20flowchart.drawio.svg"/></div>
