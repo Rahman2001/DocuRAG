@@ -22,7 +22,7 @@ class Model:
             publisher_model="publishers/google/models/text-embedding-004"
         )
 
-    def init_rag_corpus(self, corpus_name):
+    def init_rag_corpus(self, corpus_name: str, google_drive_links: [str]):
         self.__rag_corpus = rag.create_corpus(
             display_name=corpus_name,
             embedding_model_config=self.__embedding_model_config,
@@ -31,12 +31,13 @@ class Model:
         # Import Files to the RagCorpus
         response = rag.import_files(
             self.__rag_corpus.name,
-            PATHS,
+            google_drive_links,
             chunk_size=512,  # Optional
             chunk_overlap=100,  # Optional
             max_embedding_requests_per_min=900,  # Optional
         )
         logging.info("response from rag.import_files.imported_rag_files_count: %s", response.imported_rag_files_count)
+        return response.imported_rag_files_count
 
     def init_llm(self, has_rag_corpus=True):
         # Create a RAG retrieval tool
@@ -89,7 +90,7 @@ class Model:
 
 if __name__ == '__main__':
     model = Model()
-    model.init_rag_corpus("sample-article1-corpus")
+    model.init_rag_corpus("sample-article1-corpus", PATHS)
     model.init_llm()
     model.chat_cmd()
 

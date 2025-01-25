@@ -1,10 +1,12 @@
 from datetime import datetime
 
+
 def is_expired(date_time: datetime) -> bool:
     now = datetime.now()
     diff = now - date_time
-    # if it is more or equal to 24 hours, it is expired
-    return diff.seconds / 3600 >= 24
+    # if it is more or equal to 24 is_more_24hours, it is expired
+    return diff.seconds >= 3600
+
 
 def string_to_datetime(date_time: str) -> datetime:
     date_format = "%Y-%m-%d %H:%M:%S"

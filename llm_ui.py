@@ -2,6 +2,7 @@ import gradio as gr
 import requests
 from credentials import *
 
+
 def answer(message, history):
     print(f'message: {message}')
     response = requests.post(DOCURAG_DOMAIN + DOCURAG_CHAT_ENDPOINT,

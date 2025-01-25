@@ -71,8 +71,9 @@ def create_record():
     # send a message via email containing a link to the AI RAG chat
     link = DOCURAG_DOMAIN + DOCURAG_CHAT_UI_ENDPOINT + '?_id={}'.format(record_id)
     result = email.send_email(RECEIVER_ACCOUNT_ID, f'link to AI RAG: {link}')
-    print(f'result of sending email: {result}')
-    return {'recordId': f'{record_id}-success'}
+    # import document to RAG to create a corpus for AI
+    import_count = __model.init_rag_corpus(f'docurag-{record_id}-document-corpus', [request.json['data']['Google_Drive']])
+    return {'recordId': f'{record_id}-success'} if result is None and import_count == 1 else {'recordId': f'{record_id}-failure'}
 
 
 @app.route('/api/docurag/searchRecord', methods=['POST'])
@@ -103,6 +104,8 @@ def authenticate():
     if check_link.is_expired(document['datetime']):
         return jsonify({'error': 'Bad Request'}), 404
 
+    __model.init_rag_corpus(f'docurag-{_id}-document-corpus', [document['data']['Google_Drive']])
+    __model.init_llm()
     return redirect(GRADIO_APP_ENDPOINT)
 
 
@@ -110,18 +113,15 @@ def authenticate():
 def chat_llm():
     message = request.json['message']
     logging.info("message: `%s`", message)
-    #
-    # resp = __model.chat(message)
-    # data = {'answer': resp}
-    data = {'answer': 'This is your answer'}
+
+    resp = __model.chat(message)
+    data = {'answer': resp}
 
     return data
 
 
 if __name__ == '__main__':
-    # __model = Model()
-    # __model.init_rag_corpus('docurag-article1-corpus')
-    # __model.init_llm()
+    __model = Model()
     __mongodb = MongoDB('docurag-db', 'appointment')
 
     app.run(host='0.0.0.0', port=7654, debug=True)
