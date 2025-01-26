@@ -72,8 +72,8 @@ def create_record():
     link = DOCURAG_DOMAIN + DOCURAG_CHAT_UI_ENDPOINT + '?_id={}'.format(record_id)
     result = email.send_email(RECEIVER_ACCOUNT_ID, f'link to AI RAG: {link}')
     # import document to RAG to create a corpus for AI
-    import_count = __model.init_rag_corpus(f'docurag-{record_id}-document-corpus', [request.json['data']['Google_Drive']])
-    return {'recordId': f'{record_id}-success'} if result is None and import_count == 1 else {'recordId': f'{record_id}-failure'}
+    __model.init_rag_corpus(f'docurag-{record_id}-document-corpus', [request.json['data']['Google_Drive']])
+    return {'recordId': f'{record_id}-success'} if result is None else {'recordId': f'{record_id}-failure'}
 
 
 @app.route('/api/docurag/searchRecord', methods=['POST'])
@@ -94,7 +94,7 @@ def patch_record():
 
 
 @app.route('/api/docurag', methods=['GET'])
-def authenticate():
+async def authenticate():
     _id = request.args.get('_id', None)
     if _id is None:
         return jsonify({'error': 'Unauthorized Request'}), 401
@@ -104,7 +104,7 @@ def authenticate():
     if check_link.is_expired(document['datetime']):
         return jsonify({'error': 'Bad Request'}), 404
 
-    __model.init_rag_corpus(f'docurag-{_id}-document-corpus', [document['data']['Google_Drive']])
+    await __model.init_rag_corpus(f'docurag-{_id}-document-corpus', [document['data']['Google_Drive']])
     __model.init_llm()
     return redirect(GRADIO_APP_ENDPOINT)
 

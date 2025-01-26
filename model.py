@@ -22,7 +22,7 @@ class Model:
             publisher_model="publishers/google/models/text-embedding-004"
         )
 
-    def init_rag_corpus(self, corpus_name: str, google_drive_links: [str]):
+    async def init_rag_corpus(self, corpus_name: str, google_drive_links: [str]):
         self.__rag_corpus = rag.create_corpus(
             display_name=corpus_name,
             embedding_model_config=self.__embedding_model_config,
