@@ -41,7 +41,13 @@ Here, we need to to do two thigns; first, download our credentials of Google OAu
 ```
 Save the downloaded file in project root location (i.e. <code>./DocuRAG</code>); second, we need to fill our <code>credentials.py</code> with required data <i>(instructions are commented)</i>. </br><strong>Note:</strong> It is required to get a password for your email to use in your application for testing purposes. For more details, visit the link: [Support Google](https://support.google.com/mail/answer/185833?hl=en)
 ### Database
-Finally, our database needs to be configured for the application. Simply, install <strong>MongoDB</strong> in your computer and create a database called <strong>"docurag-db"</strong> and collection with a name <strong>"appointment"</strong>. 
+Our database needs to be configured for the application. Simply, install <strong>MongoDB</strong> in your computer and create a database called <strong>"docurag-db"</strong> and collection with a name <strong>"appointment"</strong>. 
+### Global Access
+Finally, we need to make our application accessible to the cloud and Docusign plaforms so that they can make requests to our server. Thus, for testing purposes we chose to use <strong>Ngrok</strong> which provides us with free global domain. The domain serves as a tunnel to our application. Install <code>ngrok</code> to your computer, for more details visit official website: [ngrok](https://download.ngrok.com/downloads/windows). After successfully installing, execute the following command: 
+```bash
+ngrok http 7654 --response-header-add "Access-Control-Allow-Origin: *" --host-header rewrite
+```
+<strong>Note:</strong> our app will be hosted in <code>7654</code> port. So, ngrok needs to listen to it.
 
 ## Run 
 After completing all the tasks above, we can run our application using two <code>.py</code> files, such as <code>api.py</code> and <code>llm_ui.py</code>.
