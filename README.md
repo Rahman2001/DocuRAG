@@ -53,5 +53,6 @@ ngrok http 7654 --response-header-add "Access-Control-Allow-Origin: *" --host-he
 
 ## Run 
 After completing all the tasks above, we can run our application using two <code>.py</code> files, such as <code>api.py</code> and <code>llm_ui.py</code>.
-### Project Demo in YouTube: [adwmow](wadiad)
+### Project Demo in YouTube: [DocuRAG demo](https://youtu.be/_IDpZQTwo5g?si=s3BXy0Pj_CaqxFTz)
+**Note:** You can use sample document uploaded to Google Drive when you want to use it in custom web-form for our application, URL: <code>https://drive.google.com/file/d/1EFe1SY_JdyHPQUjEvyfcxqmqHeaDSJIk/view?usp=sharing</code>. You can also view the sample document in <code>./docs</code> folder of the repo.
 
