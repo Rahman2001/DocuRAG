@@ -1,4 +1,6 @@
 # DocuRAG - Docusign Extension Application for Maestro Workflow
+<div align=center><img src="https://github.com/Rahman2001/DocuRAG/blob/main/resources/project%20logo.drawio.svg"/></div>
+
 ## Description
 This is half an extension and standalone application designed for Docusign platform. This application can be installed and used in Docusign Maestro Workflow.
 
